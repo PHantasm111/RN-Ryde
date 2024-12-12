@@ -15,6 +15,7 @@ import { useUser } from "@clerk/clerk-expo";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import Map from "@/components/Map";
 import { useLocationStore } from "@/store";
+import { router } from "expo-router";
 
 const recentRides = [
   {
@@ -130,7 +131,15 @@ export default function Page() {
 
   const loading = false;
   const handleSignOut = () => {};
-  const handleDestinationPress = () => {};
+  const handleDestinationPress = (location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => {
+    setDestinationLocation(location);
+
+    router.push("/(root)/find-ride");
+  };
 
   // Get permisson to access location
   const [hasPermission, setHasPermission] = useState(false);
@@ -192,11 +201,8 @@ export default function Page() {
         ListHeaderComponent={
           <>
             <View className="flex flex-row items-center justify-between my-5">
-              <Text className="text-2xl font-JakartaExtraBold capitalize">
-                Welcome{", "}
-                {user?.firstName ||
-                  user?.emailAddresses[0].emailAddress.split("@")[0]}{" "}
-                👋
+              <Text className="text-2xl font-JakartaExtraBold">
+                Welcome {user?.firstName}👋
               </Text>
               <TouchableOpacity
                 onPress={handleSignOut}
@@ -206,16 +212,14 @@ export default function Page() {
               </TouchableOpacity>
             </View>
 
-            {/*  GoogleTextInput*/}
             <GoogleTextInput
               icon={icons.search}
               containerStyle="bg-white shadow-md shadow-neutral-300"
               handlePress={handleDestinationPress}
             />
 
-            {/* Current Location - Map */}
             <>
-              <Text className="text-2xl font-JakartaBold mt-5 mb-3">
+              <Text className="text-xl font-JakartaBold mt-5 mb-3">
                 Your current location
               </Text>
               <View className="flex flex-row items-center bg-transparent h-[300px]">
@@ -223,7 +227,6 @@ export default function Page() {
               </View>
             </>
 
-            {/*  Recent Rides */}
             <Text className="text-xl font-JakartaBold mt-5 mb-3">
               Recent Rides
             </Text>
