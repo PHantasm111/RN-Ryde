@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import { Driver, MarkerData } from "@/types/type";
 import { icons } from "@/constants";
 import { useFetch } from "@/lib/fetch";
+import React from "react";
+import MapViewDirections from "react-native-maps-directions";
 
 const Map = () => {
   const { data: drivers, loading, error } = useFetch<Driver[]>("/(api)/driver");
@@ -44,7 +46,7 @@ const Map = () => {
       });
       setMarkers(newMarkers);
     }
-  }, [drivers]);
+  }, [drivers, userLatitude, userLongitude]);
 
   useEffect(() => {
     if (
@@ -62,7 +64,14 @@ const Map = () => {
         setDrivers(drivers as MarkerData[]);
       });
     }
-  }, []);
+  }, [
+    destinationLatitude,
+    destinationLongitude,
+    markers,
+    setDrivers,
+    userLatitude,
+    userLongitude,
+  ]);
 
   if (loading || !userLatitude || !userLongitude) {
     return (
@@ -110,6 +119,34 @@ const Map = () => {
           className="w-full"
         />
       ))}
+
+      {destinationLatitude && destinationLongitude && (
+        <>
+          <Marker
+            key="destination"
+            coordinate={{
+              latitude: destinationLatitude,
+              longitude: destinationLongitude,
+            }}
+            title="Destination"
+            image={icons.pin}
+          />
+
+          <MapViewDirections
+            origin={{
+              latitude: userLatitude,
+              longitude: userLongitude,
+            }}
+            destination={{
+              latitude: destinationLatitude,
+              longitude: destinationLongitude,
+            }}
+            apikey={process.env.EXPO_PUBLIC_GOOGLE_API_KEY!}
+            strokeWidth={3}
+            strokeColor="#0286ff"
+          />
+        </>
+      )}
     </MapView>
   );
 };
